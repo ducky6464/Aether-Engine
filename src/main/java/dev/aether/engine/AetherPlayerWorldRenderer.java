@@ -81,7 +81,7 @@ public final class AetherPlayerWorldRenderer {
         if (index < 0 || snapshots.playerId(index) != state.id) return false;
         if (!AetherPlayerRenderEligibility.canUseCustomBaseModel(snapshots.flags(index))) return false;
 
-        boolean captured = AetherEngine.capturePlayerGeometry(index, model.getRootPart(), matrices);
+        boolean captured = AetherEngine.capturePlayerGeometry(index, model.getRootPart(), matrices, state.light);
         if (!captured || !replacementRequested || !replacementReady
                 || !AetherPlayerPipeline.isRegistered()) {
             return false;
