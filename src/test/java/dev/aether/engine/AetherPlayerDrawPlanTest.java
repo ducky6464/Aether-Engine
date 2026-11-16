@@ -17,7 +17,7 @@ class AetherPlayerDrawPlanTest {
   String[] skins={"skin-a","skin-b","skin-c"};AetherGroupIndex<String> groups=new AetherGroupIndex<>(3);groups.build(skins,3);
   AetherPlayerBatchPlan batches=new AetherPlayerBatchPlan(3);batches.build(groups,new int[3],3);
   AetherPlayerGeometryDrawPlan plan=new AetherPlayerGeometryDrawPlan(3);
-  plan.build(batches,new int[]{1,28,60},new int[]{60,25,30},new int[]{6,3,3},3);
+  plan.build(batches,new int[]{1,28,60},new int[]{60,25,30},new int[]{6,3,2},3);
   assertEquals(0,plan.packetCount());assertEquals(3,plan.rejectedRangeCount());
  }
  @Test void rejectsMismatchedPlayerCounts(){
