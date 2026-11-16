@@ -1,6 +1,6 @@
 package dev.aether.engine;
 import java.util.Arrays;
-/** Precomputed per-player vertex ranges grouped by skin for a future GPU draw pass. */
+/** Precomputed per-player vertex ranges grouped by skin for the GPU draw pass. */
 public final class AetherPlayerGeometryDrawPlan {
  public static final int FLOATS_PER_VERTEX=AetherPlayerVertexWriter.SOURCE_FLOATS_PER_VERTEX;
  private final int capacity; private final int[] batchSkinGroups,batchStarts,batchSizes,packetPlayers,firstVertices,vertexCounts;
