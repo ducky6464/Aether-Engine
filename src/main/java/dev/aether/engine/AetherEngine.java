@@ -19,7 +19,7 @@ public final class AetherEngine {
     private static final AetherPlayerRenderQueue PLAYER_RENDER_QUEUE = new AetherPlayerRenderQueue();
     private static final AetherPlayerGeometryDrawPlan PLAYER_GEOMETRY_DRAW_PLAN = new AetherPlayerGeometryDrawPlan(PLAYER_RENDER_QUEUE.capacity());
     private static final AetherPlayerGeometryArena PLAYER_GEOMETRY_ARENA =
-            new AetherPlayerGeometryArena(128, 128, 128 * 128 * 48);
+            new AetherPlayerGeometryArena(128, 128, 128 * 128 * 60);
     private static final AetherInstanceBufferPool INSTANCE_BUFFER_POOL = new AetherInstanceBufferPool();
     private static final AetherPlayerGeometryBufferPool PLAYER_GEOMETRY_BUFFER_POOL =
             new AetherPlayerGeometryBufferPool(PLAYER_GEOMETRY_ARENA.capacityFloats());
@@ -146,9 +146,9 @@ public final class AetherEngine {
     public static AetherPlayerGeometryArena playerGeometryArena() { return PLAYER_GEOMETRY_ARENA; }
     public static AetherPlayerGeometryDrawPlan playerGeometryDrawPlan() { return PLAYER_GEOMETRY_DRAW_PLAN; }
     /** Captures the posed base model using the renderer's current entity transform. */
-    public static boolean capturePlayerGeometry(int playerIndex, ModelPart root, MatrixStack matrices) {
+    public static boolean capturePlayerGeometry(int playerIndex, ModelPart root, MatrixStack matrices, int packedLight) {
         if (!RenderSystem.isOnRenderThread() || root == null || matrices == null) return false;
-        return PLAYER_GEOMETRY_ARENA.captureOnRenderThread(playerIndex, root, matrices);
+        return PLAYER_GEOMETRY_ARENA.captureOnRenderThread(playerIndex, root, matrices, packedLight);
     }
     public static AetherInstanceBufferPool instanceBufferPool() { return INSTANCE_BUFFER_POOL; }
     public static AetherPlayerGeometryBufferPool playerGeometryBufferPool() { return PLAYER_GEOMETRY_BUFFER_POOL; }
