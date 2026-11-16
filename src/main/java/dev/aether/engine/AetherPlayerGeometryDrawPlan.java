@@ -2,7 +2,7 @@ package dev.aether.engine;
 import java.util.Arrays;
 /** Precomputed per-player vertex ranges grouped by skin for a future GPU draw pass. */
 public final class AetherPlayerGeometryDrawPlan {
- public static final int FLOATS_PER_VERTEX=AetherModelGeometryBuffer.FLOATS_PER_VERTEX;
+ public static final int FLOATS_PER_VERTEX=AetherPlayerVertexWriter.SOURCE_FLOATS_PER_VERTEX;
  private final int capacity; private final int[] batchSkinGroups,batchStarts,batchSizes,packetPlayers,firstVertices,vertexCounts;
  private int batchCount,packetCount,missingGeometryCount,rejectedRangeCount;
  public AetherPlayerGeometryDrawPlan(int capacity){if(capacity<1)throw new IllegalArgumentException("capacity must be positive");this.capacity=capacity;batchSkinGroups=new int[capacity];batchStarts=new int[capacity];batchSizes=new int[capacity];packetPlayers=new int[capacity];firstVertices=new int[capacity];vertexCounts=new int[capacity];}
