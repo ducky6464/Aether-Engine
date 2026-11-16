@@ -8,10 +8,13 @@ import java.util.Objects;
 
 /**
  * Fixed-capacity per-frame arena for captured player base-model geometry.
- * Mesh data is copied from a reusable scratch extractor into one contiguous
- * float array so later per-skin batching can reference stable player ranges.
+ * The extractor supplies eight floats per vertex; this arena appends the
+ * player's packed block/sky light coordinates for the GPU vertex format.
  */
 public final class AetherPlayerGeometryArena {
+    private static final int SOURCE_FLOATS_PER_VERTEX = AetherModelGeometryBuffer.FLOATS_PER_VERTEX;
+    private static final int DRAW_FLOATS_PER_VERTEX = AetherPlayerVertexWriter.SOURCE_FLOATS_PER_VERTEX;
+
     private final int maxPlayers;
     private final float[] vertexData;
     private final int[] offsets, floatCounts, vertexCounts;
@@ -43,7 +46,7 @@ public final class AetherPlayerGeometryArena {
     }
 
     /** Caller must invoke on Minecraft's render thread. */
-    public boolean capture(int playerIndex, ModelPart baseModelRoot, MatrixStack matrices) {
+    public boolean capture(int playerIndex, ModelPart baseModelRoot, MatrixStack matrices, int packedLight) {
         Objects.requireNonNull(baseModelRoot, "baseModelRoot");
         Objects.requireNonNull(matrices, "matrices");
         if (playerIndex < 0 || playerIndex >= maxPlayers) {
@@ -58,23 +61,42 @@ public final class AetherPlayerGeometryArena {
             overflowCount++;
             return false;
         }
-        int floats = scratch.usedFloats();
-        if (floats == 0 || floats > vertexData.length - usedFloats) {
+
+        int vertices = scratch.vertexCount();
+        int sourceFloats = scratch.usedFloats();
+        int outputFloats = Math.multiplyExact(vertices, DRAW_FLOATS_PER_VERTEX);
+        if (vertices == 0 || sourceFloats != vertices * SOURCE_FLOATS_PER_VERTEX
+                || outputFloats > vertexData.length - usedFloats) {
             overflowCount++;
             return false;
         }
+
+        int blockLight = (packedLight >>> 4) & 15;
+        int skyLight = (packedLight >>> 20) & 15;
+        float blockCoord = blockLight << 4;
+        float skyCoord = skyLight << 4;
+        float[] source = scratch.data();
+        int output = usedFloats;
+        for (int vertex = 0; vertex < vertices; vertex++) {
+            int sourceOffset = vertex * SOURCE_FLOATS_PER_VERTEX;
+            System.arraycopy(source, sourceOffset, vertexData, output, SOURCE_FLOATS_PER_VERTEX);
+            vertexData[output + 8] = blockCoord;
+            vertexData[output + 9] = skyCoord;
+            output += DRAW_FLOATS_PER_VERTEX;
+        }
+
         offsets[playerIndex] = usedFloats;
-        floatCounts[playerIndex] = floats;
-        vertexCounts[playerIndex] = scratch.vertexCount();
-        System.arraycopy(scratch.data(), 0, vertexData, usedFloats, floats);
-        usedFloats += floats;
+        floatCounts[playerIndex] = outputFloats;
+        vertexCounts[playerIndex] = vertices;
+        usedFloats += outputFloats;
         capturedPlayers++;
         return true;
     }
 
-    public boolean captureOnRenderThread(int playerIndex, ModelPart baseModelRoot, MatrixStack matrices) {
+    public boolean captureOnRenderThread(int playerIndex, ModelPart baseModelRoot,
+                                          MatrixStack matrices, int packedLight) {
         AetherRenderThread.assertCurrent();
-        return capture(playerIndex, baseModelRoot, matrices);
+        return capture(playerIndex, baseModelRoot, matrices, packedLight);
     }
 
     public int maxPlayers() { return maxPlayers; }
