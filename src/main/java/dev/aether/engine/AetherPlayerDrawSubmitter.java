@@ -6,6 +6,9 @@ import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import net.minecraft.entity.player.SkinTextures;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.LightmapTextureManager;
+import com.mojang.blaze3d.textures.FilterMode;
 
 /**
  * Submits one prepared skin batch to an already-open Minecraft render pass.
@@ -32,6 +35,10 @@ public final class AetherPlayerDrawSubmitter {
         RenderSystem.bindDefaultUniforms(pass);
         pass.setUniform("DynamicTransforms", dynamicTransforms);
         if (!AetherPlayerTextureBinder.bind(pass, skin)) return 0;
+        LightmapTextureManager lightmap = MinecraftClient.getInstance().gameRenderer.getLightmapTextureManager();
+        if (lightmap == null || lightmap.getGlTextureView() == null) return 0;
+        pass.bindTexture("Sampler2", lightmap.getGlTextureView(),
+                RenderSystem.getSamplerCache().get(FilterMode.NEAREST));
         pass.setVertexBuffer(0, vertexBuffer);
 
         int submitted = 0;
