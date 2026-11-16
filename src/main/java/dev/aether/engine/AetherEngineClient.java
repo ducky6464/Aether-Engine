@@ -22,7 +22,7 @@ public final class AetherEngineClient implements ClientModInitializer {
             LOGGER.warn("Aether pipeline registration failed; mirror mode will remain unavailable.", exception);
         }
 
-        WorldRenderEvents.START.register(context -> AetherEngine.beginFrame());
+        WorldRenderEvents.BEFORE_ENTITIES.register(context -> AetherEngine.beginFrame());
         WorldRenderEvents.AFTER_ENTITIES.register(context -> AetherEngine.endFrame());
         AetherPlayerWorldRenderer.register();
 
