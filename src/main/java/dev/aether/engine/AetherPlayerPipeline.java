@@ -28,6 +28,7 @@ public final class AetherPlayerPipeline {
                 .withVertexShader("core/aether_player")
                 .withFragmentShader("core/aether_player")
                 .withSampler("Sampler0")
+                .withSampler("Sampler2")
                 .withUniform("DynamicTransforms", UniformType.UNIFORM_BUFFER)
                 .withUniform("Projection", UniformType.UNIFORM_BUFFER)
                 .withVertexFormat(AetherPlayerVertexLayout.FORMAT, VertexFormat.DrawMode.TRIANGLES)
