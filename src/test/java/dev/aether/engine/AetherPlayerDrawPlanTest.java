@@ -29,9 +29,10 @@ class AetherPlayerDrawPlanTest {
         assertEquals(0, plan.firstVertex(0, 0));
         assertEquals(6, plan.vertexCount(0, 0));
         assertEquals(1, plan.packetPlayer(1, 0));
-        assertEquals(12, plan.firstVertex(1, 0));
+        assertEquals(6, plan.firstVertex(1, 0));
         assertEquals(3, plan.vertexCount(1, 0));
         assertEquals(3, plan.packetPlayer(2, 0));
+        assertEquals(12, plan.firstVertex(2, 0));
     }
 
     @Test
