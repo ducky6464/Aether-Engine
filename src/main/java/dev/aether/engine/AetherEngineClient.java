@@ -1,6 +1,5 @@
 package dev.aether.engine;
 
-import com.mojang.brigadier.arguments.StringArgumentType;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
@@ -26,6 +25,7 @@ public final class AetherEngineClient implements ClientModInitializer {
         WorldRenderEvents.START.register(context -> AetherEngine.beginFrame());
         WorldRenderEvents.AFTER_ENTITIES.register(context -> AetherEngine.endFrame());
         AetherPlayerWorldRenderer.register();
+
         ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
             if (com.mojang.blaze3d.systems.RenderSystem.isOnRenderThread()) {
                 AetherEngine.close();
@@ -34,28 +34,34 @@ public final class AetherEngineClient implements ClientModInitializer {
             }
         });
 
-        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
-                dispatcher.register(ClientCommandManager.literal("aether")
-                        .then(ClientCommandManager.literal("mirror")
-                                .then(ClientCommandManager.literal("on").executes(context -> {
-                                    AetherPlayerWorldRenderer.setMirrorEnabled(true);
-                                    context.getSource().sendFeedback(Text.literal("Aether mirror enabled (experimental; vanilla still renders)."));
-                                    return 1;
-                                }))
-                                .then(ClientCommandManager.literal("off").executes(context -> {
-                                    AetherPlayerWorldRenderer.setMirrorEnabled(false);
-                                    context.getSource().sendFeedback(Text.literal("Aether mirror disabled."));
-                                    return 1;
-                                })))
-                        .then(ClientCommandManager.literal("stats").executes(context -> {
-                            context.getSource().sendFeedback(Text.literal(
-                                    "Aether | mirror=" + AetherPlayerWorldRenderer.isMirrorEnabled()
-                                            + " | captured=" + AetherEngine.playerRenderQueue().size()
-                                            + " | geometry=" + AetherEngine.playerGeometryArena().capturedPlayers()
-                                            + " | packets=" + AetherEngine.playerGeometryDrawPlan().packetCount()
-                                            + " | status=" + AetherPlayerWorldRenderer.lastStatus()));
-                            return 1;
-                        })));
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+            var root = ClientCommandManager.literal("aether");
+            var mirror = ClientCommandManager.literal("mirror")
+                    .then(ClientCommandManager.literal("on").executes(context -> {
+                        AetherPlayerWorldRenderer.setMirrorEnabled(true);
+                        context.getSource().sendFeedback(Text.literal(
+                                "Aether mirror enabled (experimental; vanilla still renders)."));
+                        return 1;
+                    }))
+                    .then(ClientCommandManager.literal("off").executes(context -> {
+                        AetherPlayerWorldRenderer.setMirrorEnabled(false);
+                        context.getSource().sendFeedback(Text.literal("Aether mirror disabled."));
+                        return 1;
+                    }));
+            var stats = ClientCommandManager.literal("stats").executes(context -> {
+                context.getSource().sendFeedback(Text.literal(
+                        "Aether | mirror=" + AetherPlayerWorldRenderer.isMirrorEnabled()
+                                + " | captured=" + AetherEngine.playerRenderQueue().size()
+                                + " | geometry=" + AetherEngine.playerGeometryArena().capturedPlayers()
+                                + " | packets=" + AetherEngine.playerGeometryDrawPlan().packetCount()
+                                + " | status=" + AetherPlayerWorldRenderer.lastStatus()));
+                return 1;
+            });
+            root.then(mirror);
+            root.then(stats);
+            dispatcher.register(root);
+        });
+
         LOGGER.info("Aether Engine initialized for Minecraft 1.21.11.");
     }
 }
