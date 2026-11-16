@@ -16,8 +16,10 @@ layout(std140) uniform Projection {
 };
 
 out vec2 texCoord;
+out vec3 viewNormal;
 
 void main() {
     gl_Position = ProjMat * ModelViewMat * vec4(Position + ModelOffset, 1.0);
     texCoord = (TextureMat * vec4(UV0, 0.0, 1.0)).xy;
+    viewNormal = mat3(ModelViewMat) * Normal;
 }
