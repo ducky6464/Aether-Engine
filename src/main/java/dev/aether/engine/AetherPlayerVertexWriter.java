@@ -4,13 +4,12 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
- * Converts extractor vertices (8 floats) into a compact 24-byte GPU layout:
- * float3 position, float2 UV, normalized-byte3 normal, one pad byte.
- * No per-vertex objects or temporary arrays are allocated.
+ * Packs position, UV, normalized normal, and two packed lightmap coordinates
+ * into a 28-byte GPU vertex. Source layout: xyz, uv, normal xyz, blockLight, skyLight.
  */
 public final class AetherPlayerVertexWriter {
-    public static final int SOURCE_FLOATS_PER_VERTEX = 8;
-    public static final int GPU_BYTES_PER_VERTEX = 24;
+    public static final int SOURCE_FLOATS_PER_VERTEX = 10;
+    public static final int GPU_BYTES_PER_VERTEX = 28;
     private AetherPlayerVertexWriter() { }
 
     public static boolean write(float[] source, int floatCount, ByteBuffer target) {
@@ -24,6 +23,12 @@ public final class AetherPlayerVertexWriter {
         for (int i = 0; i < floatCount; i++) {
             if (!Float.isFinite(source[i])) return false;
         }
+        for (int i = 8; i < floatCount; i += SOURCE_FLOATS_PER_VERTEX) {
+            if (source[i] < 0.0f || source[i] > 240.0f || source[i] % 16.0f != 0.0f
+                    || source[i + 1] < 0.0f || source[i + 1] > 240.0f || source[i + 1] % 16.0f != 0.0f) {
+                return false;
+            }
+        }
 
         target.order(ByteOrder.LITTLE_ENDIAN);
         for (int i = 0; i < floatCount; i += SOURCE_FLOATS_PER_VERTEX) {
@@ -36,6 +41,8 @@ public final class AetherPlayerVertexWriter {
             target.put(toNormalizedByte(source[i + 6]));
             target.put(toNormalizedByte(source[i + 7]));
             target.put((byte) 0);
+            target.putShort((short) source[i + 8]);
+            target.putShort((short) source[i + 9]);
         }
         return true;
     }
