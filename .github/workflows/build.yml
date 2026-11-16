@@ -12,13 +12,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '21'
       - uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: '9.2.1'
+          gradle-version: '9.4.0'
       - name: Verify standalone namespace
         run: |
           if grep -R -n -E 'dev\.lowspec\.rendercore|lowspec_rendercore' src; then
