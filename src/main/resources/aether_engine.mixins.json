@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "dev.aether.engine.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "PlayerEntityRendererMixin",
+    "RenderPipelinesInvoker"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
