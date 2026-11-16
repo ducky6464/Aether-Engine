@@ -10,6 +10,7 @@ public final class AetherPlayerVertexLayout {
             .add("Position",VertexFormatElement.POSITION)
             .add("UV0",VertexFormatElement.UV0)
             .add("Normal",VertexFormatElement.NORMAL)
+            .padding(1)
             .add("UV2",VertexFormatElement.UV2).build();
     static {
         int stride=FORMAT.getVertexSize(),position=FORMAT.getOffset(VertexFormatElement.POSITION);
