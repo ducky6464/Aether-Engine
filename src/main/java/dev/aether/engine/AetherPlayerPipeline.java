@@ -25,8 +25,8 @@ public final class AetherPlayerPipeline {
         if (pipeline != null) return;
         RenderPipeline candidate = RenderPipeline.builder()
                 .withLocation(LOCATION)
-                .withVertexShader("core/aether_player")
-                .withFragmentShader("core/aether_player")
+                .withVertexShader(Identifier.of("aether_engine", "core/aether_player"))
+                .withFragmentShader(Identifier.of("aether_engine", "core/aether_player"))
                 .withSampler("Sampler0")
                 .withSampler("Sampler2")
                 .withUniform("DynamicTransforms", UniformType.UNIFORM_BUFFER)
