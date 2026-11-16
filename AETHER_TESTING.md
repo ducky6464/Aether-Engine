@@ -4,7 +4,18 @@
 
 Aether is a standalone Fabric client mod for Minecraft 1.21.11 / Java 21.
 
-The first replacement path handles only ordinary, visible, standing player base models. Player feature layers (armor, capes, held items, name tags, and other overlays) remain vanilla. Spectators, invisible players, special poses/effects, outlines, and unsupported model implementations remain vanilla.
+The replacement path captures the posed player base model at the same point vanilla submits it. This allows the custom base-model path to handle ordinary standing, baby-scaled, sneaking, swimming, gliding, sleeping, upside-down, and flying-rotation poses. Hurt/shaking, invisible, spectator, outline, and extra-ear states stay on vanilla. Armor, capes, held items, name tags, fire overlays, and other feature layers remain vanilla.
+
+## Automated checks
+
+Run:
+
+```sh
+gradle test
+gradle build
+```
+
+The tests cover player-state routing and the compact CPU-to-GPU vertex packing contract.
 
 ## In-game checks
 
@@ -12,10 +23,10 @@ The first replacement path handles only ordinary, visible, standing player base 
 2. Launch a test world and verify startup completes without a Mixin error.
 3. Run `/aether stats` and verify player capture counts update.
 4. Run `/aether mirror on` first. Confirm the extra player model is visually aligned, textured, lit, and depth-tested. Run `/aether mirror off` afterward.
-5. Run `/aether replace on`. Aether first keeps vanilla rendering while it validates a complete custom draw frame. Once armed, eligible ordinary player base models are submitted by Aether instead of vanilla.
+5. Run `/aether replace on`. Aether first keeps vanilla rendering while it validates a complete custom draw frame. Once armed, eligible player base models are submitted by Aether instead of vanilla.
 6. Run `/aether stats` and inspect `replaceReady`, `suppressed`, and `status`.
 7. Run `/aether replace off` immediately if any player base model disappears, flickers, has incorrect positioning, skin transparency, lighting, or depth behavior.
-8. Test with multiple skins, resource reloads, world changes, and multiplayer players.
+8. Test standing, sneaking, swimming, gliding, sleeping, baby-sized, and upside-down player poses, plus multiple skins, resource reloads, world changes, and multiplayer players.
 
 ## Fallback behavior and limitations
 

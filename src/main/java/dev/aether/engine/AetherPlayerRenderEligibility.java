@@ -1,9 +1,12 @@
 package dev.aether.engine;
 
 /**
- * Conservative routing policy for the first base-player renderer prototype.
- * Until a custom path explicitly supports a state, that player stays on
- * Minecraft's renderer. This class does not suppress vanilla rendering.
+ * Conservative routing policy for the base-player model renderer.
+ *
+ * The model geometry is captured at vanilla's base-model submission point,
+ * after the renderer has applied the current pose and entity transform. Pose
+ * flags therefore do not require a separate custom animation implementation.
+ * Effects that alter vanilla's color/visibility path still use vanilla.
  */
 public final class AetherPlayerRenderEligibility {
     public enum Route {
@@ -18,32 +21,23 @@ public final class AetherPlayerRenderEligibility {
 
     private AetherPlayerRenderEligibility() { }
 
-    /**
-     * Only ordinary, visible, standing players are candidates for a future
-     * base-model batch. All feature layers remain vanilla even for candidates.
-     */
     public static Route classify(int flags) {
         if ((flags & AetherPlayerRenderQueue.SPECTATOR) != 0) return Route.VANILLA_SPECTATOR;
         if ((flags & (AetherPlayerRenderQueue.INVISIBLE
                 | AetherPlayerRenderQueue.INVISIBLE_TO_PLAYER)) != 0) {
             return Route.VANILLA_INVISIBLE;
         }
-        if ((flags & (AetherPlayerRenderQueue.BABY
-                | AetherPlayerRenderQueue.SNEAKING
-                | AetherPlayerRenderQueue.SWIMMING
-                | AetherPlayerRenderQueue.GLIDING
-                | AetherPlayerRenderQueue.SLEEPING
-                | AetherPlayerRenderQueue.UPSIDE_DOWN
-                | AetherPlayerRenderQueue.APPLY_FLYING_ROTATION)) != 0) {
-            return Route.VANILLA_SPECIAL_POSE;
-        }
         if ((flags & (AetherPlayerRenderQueue.HURT
-                | AetherPlayerRenderQueue.SHAKING
-                | AetherPlayerRenderQueue.ON_FIRE)) != 0) {
+                | AetherPlayerRenderQueue.SHAKING)) != 0) {
             return Route.VANILLA_SPECIAL_EFFECT;
         }
         if ((flags & AetherPlayerRenderQueue.OUTLINE) != 0) return Route.VANILLA_OUTLINE;
         if ((flags & AetherPlayerRenderQueue.EXTRA_EARS) != 0) return Route.VANILLA_EXTRA_GEOMETRY;
+
+        // Baby scale, sneaking, swimming, gliding, sleeping, upside-down and
+        // flying rotations are already reflected in the posed ModelPart tree
+        // and the MatrixStack by the time vanilla submits the base model.
+        // Fire is a separate feature overlay; it remains vanilla-rendered.
         return Route.CUSTOM_BASE_MODEL;
     }
 
