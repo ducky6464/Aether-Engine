@@ -65,4 +65,26 @@ class AetherPlayerDrawPlanTest {
         assertThrows(IllegalArgumentException.class,
                 () -> plan.build(batches, new int[2], new int[2], new int[2], 2));
     }
+
+    @Test
+    void clearsPreviousPacketsAndCountersWhenRebuiltWithNoPlayers() {
+        AetherGroupIndex<String> groups = new AetherGroupIndex<>(2);
+        groups.build(new String[]{"skin-a", "skin-b"}, 2);
+        AetherPlayerBatchPlan batches = new AetherPlayerBatchPlan(2);
+        batches.build(groups, new int[2], 2);
+
+        AetherPlayerGeometryDrawPlan plan = new AetherPlayerGeometryDrawPlan(2);
+        plan.build(batches, new int[]{0, -1}, new int[]{48, 0}, new int[]{6, 0}, 2);
+        assertEquals(1, plan.packetCount());
+        assertEquals(1, plan.missingGeometryCount());
+
+        groups.clear();
+        batches.build(groups, new int[2], 0);
+        plan.build(batches, new int[0], new int[0], new int[0], 0);
+
+        assertEquals(0, plan.packetCount());
+        assertEquals(0, plan.batchCount());
+        assertEquals(0, plan.missingGeometryCount());
+        assertEquals(0, plan.rejectedRangeCount());
+    }
 }
