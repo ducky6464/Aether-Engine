@@ -43,6 +43,11 @@ public final class AetherPlayerWorldRenderer {
         WorldRenderEvents.AFTER_ENTITIES.register(context -> drawAfterEntities());
     }
 
+    /** Player snapshot collection is disabled during ordinary vanilla gameplay. */
+    public static boolean shouldCapturePlayerSnapshots() {
+        return mirrorEnabled || replacementRequested;
+    }
+
     public static void setMirrorEnabled(boolean enabled) {
         mirrorEnabled = enabled;
         if (!replacementRequested) {
@@ -75,7 +80,7 @@ public final class AetherPlayerWorldRenderer {
      */
     public static boolean captureAndShouldSuppressVanilla(
             PlayerEntityRenderState state, PlayerEntityModel model, MatrixStack matrices) {
-        if (state == null || model == null || matrices == null) return false;
+        if (!shouldCapturePlayerSnapshots() || state == null || model == null || matrices == null) return false;
         AetherPlayerRenderQueue snapshots = AetherEngine.playerRenderQueue();
         int index = snapshots.size() - 1;
         if (index < 0 || snapshots.playerId(index) != state.id) return false;
@@ -92,7 +97,7 @@ public final class AetherPlayerWorldRenderer {
     }
 
     private static void drawAfterEntities() {
-        if (!mirrorEnabled && !replacementRequested) return;
+        if (!shouldCapturePlayerSnapshots()) return;
         if (!RenderSystem.isOnRenderThread()) {
             replacementReady = false;
             skippedFrames++;
