@@ -20,6 +20,7 @@ A standalone experimental Fabric client mod for Minecraft 1.21.11.
 - `/aether profile start` - record 300 rolling CPU-side frame-time samples.
 - `/aether profile report` - report average, p95, p99, maximum CPU render-call time, current FPS, estimated render rate from average CPU render-call time, counts of samples exceeding 16.67/20/33.33/50 ms, and Java heap use.
 - `/aether profile stop` - stop sampling.
+- `/aether chunks` - report the vanilla chunk builder's scheduled tasks, pending uploads, free buffers, completed chunks, and debug summary.
 - `/aether stats`
 - `/aether mirror on|off`
 - `/aether replace on|off`
