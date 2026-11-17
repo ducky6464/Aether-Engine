@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +59,23 @@ public final class AetherEngineClient implements ClientModInitializer {
                         AetherPlayerWorldRenderer.setReplacementEnabled(false);
                         context.getSource().sendFeedback(Text.literal(
                                 "Aether replacement disabled. Vanilla base-model rendering restored."));
+                        return 1;
+                    })));
+            root.then(ClientCommandManager.literal("profile")
+                    .then(ClientCommandManager.literal("start").executes(context -> {
+                        AetherFrameProfiler.start();
+                        context.getSource().sendFeedback(Text.literal(
+                                "RetroGPU profiler started. Collect at least 30 seconds in a repeatable scene."));
+                        return 1;
+                    }))
+                    .then(ClientCommandManager.literal("stop").executes(context -> {
+                        AetherFrameProfiler.stop();
+                        context.getSource().sendFeedback(Text.literal("RetroGPU profiler stopped."));
+                        return 1;
+                    }))
+                    .then(ClientCommandManager.literal("report").executes(context -> {
+                        context.getSource().sendFeedback(Text.literal(
+                                AetherFrameProfiler.report(MinecraftClient.getInstance().getCurrentFps())));
                         return 1;
                     })));
             root.then(ClientCommandManager.literal("stats").executes(context -> {
