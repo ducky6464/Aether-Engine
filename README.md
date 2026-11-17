@@ -13,9 +13,15 @@ A standalone experimental Fabric client mod for Minecraft 1.21.11.
 - Automated routing and vertex-packing tests run as part of the Gradle build.
 - Replacement is experimental and has not yet been validated in a real Minecraft world.
 - No performance improvement is claimed until measured in-world.
+- The RetroGPU profiling branch adds an opt-in CPU frame profiler. It measures wall-clock time inside MinecraftClient.render(boolean); it does not measure GPU execution time and must not be interpreted as GPU frame time.
 
 ## Commands
 
+- `/aether profile start` - record 300 rolling CPU-side frame-time samples.
+- `/aether profile report` - report average, p95, p99, maximum CPU render-call time, current FPS, estimated render rate from average CPU render-call time, counts of samples exceeding 16.67/20/33.33/50 ms, and Java heap use.
+- `/aether profile stop` - stop sampling.
+- `/aether chunks` - report the vanilla chunk builder's scheduled tasks, pending uploads, free buffers, completed chunks, and debug summary.
+- `/aether chunks profile start|report|stop` - optionally measure CPU time spent draining the vanilla chunk-upload queue; this is not GPU completion time.
 - `/aether stats`
 - `/aether mirror on|off`
 - `/aether replace on|off`

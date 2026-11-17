@@ -36,7 +36,8 @@ public abstract class PlayerEntityRendererMixin {
                                                 OrderedRenderCommandQueue queue,
                                                 CameraRenderState cameraState,
                                                 CallbackInfo ci) {
-        if (state instanceof PlayerEntityRenderState playerState) {
+        if (AetherPlayerWorldRenderer.shouldCapturePlayerSnapshots()
+                && state instanceof PlayerEntityRenderState playerState) {
             AetherEngine.playerRenderQueue().capture(playerState);
         }
     }
@@ -68,7 +69,8 @@ public abstract class PlayerEntityRendererMixin {
             int outlineColor,
             ModelCommandRenderer.CrumblingOverlayCommand crumblingOverlay) {
 
-        if (submittedState instanceof PlayerEntityRenderState playerState
+        if (AetherPlayerWorldRenderer.shouldCapturePlayerSnapshots()
+                && submittedState instanceof PlayerEntityRenderState playerState
                 && model instanceof PlayerEntityModel playerModel
                 && AetherPlayerWorldRenderer.captureAndShouldSuppressVanilla(
                         playerState, playerModel, matrices)) {

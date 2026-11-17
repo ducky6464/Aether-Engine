@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +61,60 @@ public final class AetherEngineClient implements ClientModInitializer {
                                 "Aether replacement disabled. Vanilla base-model rendering restored."));
                         return 1;
                     })));
+            root.then(ClientCommandManager.literal("profile")
+                    .then(ClientCommandManager.literal("start").executes(context -> {
+                        AetherFrameProfiler.start();
+                        context.getSource().sendFeedback(Text.literal(
+                                "RetroGPU profiler started. Collect at least 30 seconds in a repeatable scene."));
+                        return 1;
+                    }))
+                    .then(ClientCommandManager.literal("stop").executes(context -> {
+                        AetherFrameProfiler.stop();
+                        context.getSource().sendFeedback(Text.literal("RetroGPU profiler stopped."));
+                        return 1;
+                    }))
+                    .then(ClientCommandManager.literal("report").executes(context -> {
+                        context.getSource().sendFeedback(Text.literal(
+                                AetherFrameProfiler.report(MinecraftClient.getInstance().getCurrentFps())));
+                        return 1;
+                    })));
+            var chunks = ClientCommandManager.literal("chunks").executes(context -> {
+                MinecraftClient client = MinecraftClient.getInstance();
+                var renderer = client.worldRenderer;
+                var chunkBuilder = renderer.getChunkBuilder();
+                if (chunkBuilder == null) {
+                    context.getSource().sendFeedback(Text.literal("Aether chunks | chunk builder unavailable (not in a loaded world)."));
+                    return 1;
+                }
+                String report = String.format(
+                        java.util.Locale.ROOT,
+                        "Aether chunks | scheduledTasks=%d | pendingUploads=%d | freeBuffers=%d | completedChunks=%d | chunkCount=%.0f | %s",
+                        chunkBuilder.getScheduledTaskCount(),
+                        chunkBuilder.getChunksToUpload(),
+                        chunkBuilder.getFreeBufferCount(),
+                        renderer.getCompletedChunkCount(),
+                        renderer.getChunkCount(),
+                        chunkBuilder.getDebugString());
+                context.getSource().sendFeedback(Text.literal(report));
+                return 1;
+            });
+            chunks.then(ClientCommandManager.literal("profile")
+                    .then(ClientCommandManager.literal("start").executes(context -> {
+                        AetherChunkUploadProfiler.start();
+                        context.getSource().sendFeedback(Text.literal(
+                                "Chunk upload CPU profiler started. Collect a repeatable scene for 30 seconds."));
+                        return 1;
+                    }))
+                    .then(ClientCommandManager.literal("stop").executes(context -> {
+                        AetherChunkUploadProfiler.stop();
+                        context.getSource().sendFeedback(Text.literal("Chunk upload CPU profiler stopped."));
+                        return 1;
+                    }))
+                    .then(ClientCommandManager.literal("report").executes(context -> {
+                        context.getSource().sendFeedback(Text.literal(AetherChunkUploadProfiler.report()));
+                        return 1;
+                    })));
+            root.then(chunks);
             root.then(ClientCommandManager.literal("stats").executes(context -> {
                 context.getSource().sendFeedback(Text.literal(
                         "Aether | mirror=" + AetherPlayerWorldRenderer.isMirrorEnabled()
