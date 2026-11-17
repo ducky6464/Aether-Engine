@@ -78,7 +78,7 @@ public final class AetherEngineClient implements ClientModInitializer {
                                 AetherFrameProfiler.report(MinecraftClient.getInstance().getCurrentFps())));
                         return 1;
                     })));
-            root.then(ClientCommandManager.literal("chunks").executes(context -> {
+            var chunks = ClientCommandManager.literal("chunks").executes(context -> {
                 MinecraftClient client = MinecraftClient.getInstance();
                 var renderer = client.worldRenderer;
                 var chunkBuilder = renderer.getChunkBuilder();
@@ -97,7 +97,24 @@ public final class AetherEngineClient implements ClientModInitializer {
                         chunkBuilder.getDebugString());
                 context.getSource().sendFeedback(Text.literal(report));
                 return 1;
-            }));
+            });
+            chunks.then(ClientCommandManager.literal("profile")
+                    .then(ClientCommandManager.literal("start").executes(context -> {
+                        AetherChunkUploadProfiler.start();
+                        context.getSource().sendFeedback(Text.literal(
+                                "Chunk upload CPU profiler started. Collect a repeatable scene for 30 seconds."));
+                        return 1;
+                    }))
+                    .then(ClientCommandManager.literal("stop").executes(context -> {
+                        AetherChunkUploadProfiler.stop();
+                        context.getSource().sendFeedback(Text.literal("Chunk upload CPU profiler stopped."));
+                        return 1;
+                    }))
+                    .then(ClientCommandManager.literal("report").executes(context -> {
+                        context.getSource().sendFeedback(Text.literal(AetherChunkUploadProfiler.report()));
+                        return 1;
+                    })));
+            root.then(chunks);
             root.then(ClientCommandManager.literal("stats").executes(context -> {
                 context.getSource().sendFeedback(Text.literal(
                         "Aether | mirror=" + AetherPlayerWorldRenderer.isMirrorEnabled()
