@@ -47,6 +47,6 @@ The tests cover player-state routing and the compact CPU-to-GPU vertex packing c
 5. Run `/aether profile stop`.
 6. Repeat the exact scene with the baseline mod set and then with each experimental feature enabled separately.
 
-The report includes current FPS, average/p95/p99/max wall-clock time spent inside MinecraftClient.render(boolean), and Java heap use. This is CPU-side render-call timing only. It does not measure GPU completion time, VirGL queue time, or total frame presentation latency. Use it to compare repeatable CPU-side behavior, not as proof of GPU performance.
+The report includes current FPS, average/p95/p99/max wall-clock time spent inside MinecraftClient.render(boolean), estimated render rate from average CPU render-call time, counts of samples exceeding 16.67/20/33.33/50 ms, and Java heap use. This is CPU-side render-call timing only. It does not measure GPU completion time, VirGL queue time, or total frame presentation latency. Use it to compare repeatable CPU-side behavior, not as proof of GPU performance.
 
 The profiler is opt-in and uses a fixed 300-sample ring. With profiling disabled, its mixin hooks take a fast disabled check and do not allocate per frame.
