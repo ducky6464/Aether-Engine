@@ -42,21 +42,26 @@ public final class AetherFrameProfiler {
         }
     }
 
-    public static synchronized void endFrame() {
-        if (!enabled || frameStartNanos == 0L) {
+    public static void endFrame() {
+        if (!enabled) {
             return;
         }
+        synchronized (AetherFrameProfiler.class) {
+            if (!enabled || frameStartNanos == 0L) {
+                return;
+            }
 
-        long elapsed = System.nanoTime() - frameStartNanos;
-        frameStartNanos = 0L;
-        if (elapsed <= 0L) {
-            return;
-        }
+            long elapsed = System.nanoTime() - frameStartNanos;
+            frameStartNanos = 0L;
+            if (elapsed <= 0L) {
+                return;
+            }
 
-        SAMPLES_NANOS[cursor] = elapsed;
-        cursor = (cursor + 1) % CAPACITY;
-        if (sampleCount < CAPACITY) {
-            sampleCount++;
+            SAMPLES_NANOS[cursor] = elapsed;
+            cursor = (cursor + 1) % CAPACITY;
+            if (sampleCount < CAPACITY) {
+                sampleCount++;
+            }
         }
     }
 
