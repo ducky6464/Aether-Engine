@@ -78,6 +78,26 @@ public final class AetherEngineClient implements ClientModInitializer {
                                 AetherFrameProfiler.report(MinecraftClient.getInstance().getCurrentFps())));
                         return 1;
                     })));
+            root.then(ClientCommandManager.literal("chunks").executes(context -> {
+                MinecraftClient client = MinecraftClient.getInstance();
+                var renderer = client.worldRenderer;
+                var chunkBuilder = renderer.getChunkBuilder();
+                if (chunkBuilder == null) {
+                    context.getSource().sendFeedback(Text.literal("Aether chunks | chunk builder unavailable (not in a loaded world)."));
+                    return 1;
+                }
+                String report = String.format(
+                        java.util.Locale.ROOT,
+                        "Aether chunks | scheduledTasks=%d | pendingUploads=%d | freeBuffers=%d | completedChunks=%d | chunkCount=%.0f | %s",
+                        chunkBuilder.getScheduledTaskCount(),
+                        chunkBuilder.getChunksToUpload(),
+                        chunkBuilder.getFreeBufferCount(),
+                        renderer.getCompletedChunkCount(),
+                        renderer.getChunkCount(),
+                        chunkBuilder.getDebugString());
+                context.getSource().sendFeedback(Text.literal(report));
+                return 1;
+            }));
             root.then(ClientCommandManager.literal("stats").executes(context -> {
                 context.getSource().sendFeedback(Text.literal(
                         "Aether | mirror=" + AetherPlayerWorldRenderer.isMirrorEnabled()
