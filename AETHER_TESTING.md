@@ -36,3 +36,17 @@ The tests cover player-state routing and the compact CPU-to-GPU vertex packing c
 - If the custom pass reports a failure, Aether disarms replacement so vanilla rendering resumes on the following frame. A GPU failure can still cause a one-frame visual gap because the ordered vanilla command has already been skipped for that frame.
 - This is experimental and has not yet been validated in a real Minecraft world or multiplayer session.
 - No performance gains are claimed. Measure only after visual correctness is confirmed.
+
+
+## CPU frame profiling (RetroGPU work)
+
+1. Use the same world, location, camera direction, render distance, and graphics settings for every comparison.
+2. Run `/aether profile start`.
+3. Play or stand in the chosen scene for at least 30 seconds.
+4. Run `/aether profile report` and save the output.
+5. Run `/aether profile stop`.
+6. Repeat the exact scene with the baseline mod set and then with each experimental feature enabled separately.
+
+The report includes current FPS, average/p95/p99/max wall-clock time spent inside MinecraftClient.render(boolean), and Java heap use. This is CPU-side render-call timing only. It does not measure GPU completion time, VirGL queue time, or total frame presentation latency. Use it to compare repeatable CPU-side behavior, not as proof of GPU performance.
+
+The profiler is opt-in and uses a fixed 300-sample ring. With profiling disabled, its mixin hooks take a fast disabled check and do not allocate per frame.
