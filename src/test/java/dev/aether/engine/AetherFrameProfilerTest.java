@@ -6,6 +6,35 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AetherFrameProfilerTest {
     @Test
+    void keepsOnlyTheMostRecentThreeHundredSamples() {
+        AetherFrameProfiler.start();
+        try {
+            for (int i = 0; i < 305; i++) {
+                AetherFrameProfiler.beginFrame();
+                AetherFrameProfiler.endFrame();
+            }
+            assertTrue(AetherFrameProfiler.report(60).contains("(300 samples)"));
+        } finally {
+            AetherFrameProfiler.stop();
+        }
+    }
+
+    @Test
+    void restartingProfilerClearsPreviousSamples() {
+        AetherFrameProfiler.start();
+        AetherFrameProfiler.beginFrame();
+        AetherFrameProfiler.endFrame();
+        AetherFrameProfiler.stop();
+
+        AetherFrameProfiler.start();
+        try {
+            assertTrue(AetherFrameProfiler.report(60).contains("no samples"));
+        } finally {
+            AetherFrameProfiler.stop();
+        }
+    }
+
+    @Test
     void recordsCpuFrameSamplesAndStopsCleanly() throws InterruptedException {
         AetherFrameProfiler.start();
         try {
