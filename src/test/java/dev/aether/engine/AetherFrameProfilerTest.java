@@ -28,7 +28,7 @@ class AetherFrameProfilerTest {
 
         AetherFrameProfiler.start();
         try {
-            assertTrue(AetherFrameProfiler.report(60).contains("no samples"));
+            assertTrue(AetherFrameProfiler.report(60).contains("collecting samples"));
         } finally {
             AetherFrameProfiler.stop();
         }
