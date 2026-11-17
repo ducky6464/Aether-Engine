@@ -4,7 +4,6 @@ import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.util.math.MatrixStack;
-import dev.aether.engine.AetherEngineClient;
 
 /**
  * Public entry point for Aether's Minecraft-specialized rendering API.
@@ -49,9 +48,11 @@ public final class AetherEngine {
     }
 
     public static void endFrame() {
-        // Always keep CPU diagnostics current, but do not upload player meshes unless
-        // the explicit visual mirror test requests a GPU draw this frame.
-        buildPlayerGeometryDrawPlan();
+        // Player grouping and draw-plan generation are only useful to the opt-in
+        // mirror/replacement path. Do not spend CPU time on them in normal play.
+        if (AetherPlayerWorldRenderer.shouldCapturePlayerSnapshots()) {
+            buildPlayerGeometryDrawPlan();
+        }
         if (INSTANCE_BATCH.instanceCount() > 0) {
             lastUploadedInstanceBuffer = INSTANCE_BUFFER_POOL.upload(INSTANCE_BATCH);
         }
