@@ -17,6 +17,9 @@ class AetherFrameProfilerTest {
             assertTrue(report.contains("(1 samples)"), report);
             assertTrue(report.contains("avg="), report);
             assertTrue(report.contains("p95="), report);
+            assertTrue(report.contains("avg-render-rate="), report);
+            assertTrue(report.contains(">16.67ms="), report);
+            assertTrue(report.contains(">33.33ms="), report);
             assertTrue(report.contains("GPU time not measured"), report);
         } finally {
             AetherFrameProfiler.stop();
