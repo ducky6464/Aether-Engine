@@ -97,7 +97,7 @@ public final class AetherEngine {
     /**
      * Uploads this frame's captured geometry only when a caller explicitly requests
      * a custom draw (currently the opt-in mirror test). Normal vanilla gameplay
-     * still collects CPU diagnostics but does not pay the GPU upload cost.
+     * does not build or upload custom player geometry.
      */
     public static GpuBuffer preparePlayerGeometryForDraw() {
         AetherRenderThread.assertCurrent();
