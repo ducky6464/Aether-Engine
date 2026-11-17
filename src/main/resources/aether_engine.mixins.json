@@ -5,6 +5,7 @@
   "client": [
     "PlayerEntityRendererMixin",
     "MinecraftClientFrameProfilerMixin",
+    "ChunkBuilderUploadProfilerMixin",
     "RenderPipelinesInvoker"
   ],
   "injectors": {
